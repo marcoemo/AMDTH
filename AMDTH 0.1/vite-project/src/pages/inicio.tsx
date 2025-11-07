@@ -1,20 +1,32 @@
 import React, { useState } from "react";
 import { animals } from "../data/animales.mocks";
+import { products } from "../data/productos.mock";
 
 export default function Inicio() {
   const [busqueda, setBusqueda] = useState("");
 
-  // Filtrar animales según búsqueda
-  const filtrados = animals
-    .filter(a =>
-      a.nombre.toLowerCase().includes(busqueda.toLowerCase())
-    )
-    .slice(0, 3); // Mostrar solo 3
+  // Filtrar animales y productos según búsqueda
+  const animalesFiltrados = animals.filter((a) =>
+    a.nombre.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
+  const productosFiltrados = products.filter((p) =>
+    p.nombre.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
+  // Mostrar solo los primeros 3 resultados combinados
+  const resultados = [...animalesFiltrados, ...productosFiltrados].slice(0, 3);
+
+  // navegación por hash (como usa App.tsx)
+  const irA = (hash: string) => {
+    window.location.hash = hash;
+  };
 
   return (
     <div className="inicio">
       <h2>🐾 Bienvenido</h2>
 
+      {/* Buscador */}
       <div className="buscador">
         <input
           type="text"
@@ -25,17 +37,34 @@ export default function Inicio() {
         />
       </div>
 
+      {/* Resultados */}
       <div className="animales-container">
-        {filtrados.map((animals) => (
-          <div key={animals.id} className="animal-card">
+        {resultados.map((item) => (
+          <div key={item.id} className="animal-card">
             <img
-              src={animals.imagen}
-              alt={animals.nombre}
+              src={item.imagen}
+              alt={item.nombre}
               className="animal-imagen"
             />
-            <h3>{animals.nombre}</h3>
-            <p>{animals.descripcion}</p>
-            <button className="btn-adoptar">Adoptar</button>
+            <h3>{item.nombre}</h3>
+            <p>{item.descripcion}</p>
+
+            {/* Si el objeto tiene "estado", asumimos que es un animal */}
+            {"estado" in item ? (
+              <button
+                className="btn-adoptar"
+                onClick={() => irA("#adopcion")}
+              >
+                Adoptar
+              </button>
+            ) : (
+              <button
+                className="btn-adoptar"
+                onClick={() => irA("#tienda")}
+              >
+                Ver producto
+              </button>
+            )}
           </div>
         ))}
       </div>
